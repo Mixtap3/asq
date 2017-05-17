@@ -1,28 +1,56 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import bodyParser from 'body-parser';
-var path = require('path');
+/* eslint no-console: 0 */
+const mongoose = require('mongoose');
 
-import routes from './routes';
+const path = require('path');
+const express = require('express');
+const webpack = require('webpack');
+const webpackMiddleware = require('webpack-dev-middleware');
+const webpackHotMiddleware = require('webpack-hot-middleware');
+const config = require('../webpack.config.js');
 
-mongoose.connect('mongodb://localhost:27017/lelle', () => {
-    console.log('Connected to mongodb...');
-});
+const isDeveloping = process.env.NODE_ENV !== 'production';
+const port = isDeveloping ? 3000 : process.env.PORT;
+
+const envPath = path.resolve(path.join(__dirname, '/.env'));
+require('dotenv').config({ path: envPath }); // satter variabler i process.env fran env-filen 
 
 const app = express();
 
-// View
-//app.set('views', path.join(__dirname, 'views'));
-app.use(express.static(__dirname + '/views'));
-
-//Middleware
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-
-app.use('/api', routes);
- 
-app.get('/', (req, res) => {
-	res.render('signupForm');
+mongoose.connect(process.env.MONGO, () => {
+    console.log('Connected to mongodb...');
 });
 
-export default app;
+if (isDeveloping) {
+  const compiler = webpack(config);
+  const middleware = webpackMiddleware(compiler, {
+    publicPath: config.output.publicPath,
+    contentBase: 'src',
+    stats: {
+      colors: true,
+      hash: false,
+      timings: true,
+      chunks: false,
+      chunkModules: false,
+      modules: false
+    }
+  });
+
+  app.use(middleware);
+  app.use(webpackHotMiddleware(compiler));
+  app.get('*', function response(req, res) {
+    res.write(middleware.fileSystem.readFileSync(path.join(__dirname, 'dist/index.html')));
+    res.end();
+  });
+} else {
+  app.use(express.static(__dirname + '/dist'));
+  app.get('*', function response(req, res) {
+    res.sendFile(path.join(__dirname, 'dist/index.html'));
+  });
+}
+
+app.listen(port, '0.0.0.0', function onStart(err) {
+  if (err) {
+    console.log(err);
+  }
+  console.info('==> 🌎 Listening on port %s. Open up http://0.0.0.0:%s/ in your browser.', port, port);
+});
