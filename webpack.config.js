@@ -6,13 +6,18 @@ var CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   devtool: 'eval-source-map',
-  entry: [ // definiera main filen
-    'webpack-hot-middleware/client?reload=true',
-    path.join(__dirname, 'client/main.jsx')
-  ],
+  entry: {main: [ // definiera main filen
+      'webpack-hot-middleware/client?reload=true',
+      path.join(__dirname, 'client/main.jsx')
+    ],
+    jquery: "./server/views/js/jquery.js",
+    bootstrap: "./server/views/js/bootstrap.js",
+    bootstrapMin: "./server/views/js/bootstrap.min.js"
+  },
+
   output: {
     path: path.join(__dirname, '/dist/'),
-    filename: 'main.js',
+    filename: '[name].js',
     publicPath: '/'
   },
 
@@ -37,10 +42,19 @@ plugins: [
       { from: 'client/assets/index.html', to: 'index.html' },
       // { from: 'src/assets/favicon.ico', to: 'assets/favicon.ico' },
     ]),
-    new ExtractTextPlugin("[name].css")
+    new ExtractTextPlugin("[name].css"),
+    new webpack.optimize.CommonsChunkPlugin({name: 'vendors', filename: 'vendors.js'}),
+        new webpack.ProvidePlugin({
+            '$': 'jquery',
+            'jQuery': 'jquery',
+            'window.jQuery': 'jquery'
+        })
   ],
+
   module: {
-    loaders: [{
+    loaders: [
+      { test: /assets\/js\//, 
+        loader: 'imports?jQuery=jquery' },{
       test: /\.jsx?$/,
       exclude: /node_modules/,
       loader: 'babel-loader',
@@ -49,16 +63,12 @@ plugins: [
       loader: 'json-loader'
     },{
       test: /\.css$/,
-      loader: "style-loader!css-loader"
+      loader: ExtractTextPlugin.extract({loader: 'css-loader', fallback: 'style-loader'})
     },
             // Optionally extract less files
             // or any other compile-to-css language
     {
-      test: /\.less$/,
-      loader: ExtractTextPlugin.extract({fallback: 'style-loader', use: 'css-loader!less-loader'})
-    },
-    {
-      test: /\.(woff|png|jpg|gif)$/, 
+      test: /\.(woff|woff2|eot|ttf|png|jpg|gif)$/, 
       loader: 'url-loader?limit=10000' 
     },{
       test: /\.svg$/,

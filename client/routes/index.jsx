@@ -8,7 +8,7 @@ import StartPage from './StartPage';
 
 const RootPage = () => (
   <Router>
-    <div styleName="page">
+    <div>
       <Route exact path="/" component={StartPage} />
     </div>
   </Router>

@@ -1,12 +1,14 @@
 import React from 'react';
 
-import { TemplateContainer } from '../features/TemplateCode';
+import { LandingContainer } from '../features/TemplateCode';
 
-import styles from '../styles/main.css';
+import styles from '../styles/css/stylish-portfolio.css';
+import css from '../styles/css/bootstrap.css';
 
 const StartPage = () => (
   <div>
-    <TemplateContainer />
+    <LandingContainer />
+
   </div>
 );
 

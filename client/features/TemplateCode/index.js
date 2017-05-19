@@ -1,3 +1,4 @@
-import TemplateContainer from './containers/TemplateContainer';
+import LandingContainer from './containers/LandingContainer';
 
-export { TemplateContainer };
+
+export { LandingContainer };
