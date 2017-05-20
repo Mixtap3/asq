@@ -53,7 +53,7 @@ plugins: [
 
   module: {
     loaders: [
-      { test: /assets\/js\//, 
+      { test: path.join(__dirname, 'client', 'assets', 'js'), 
         loader: 'imports?jQuery=jquery' },{
       test: /\.jsx?$/,
       exclude: /node_modules/,
@@ -77,6 +77,7 @@ plugins: [
 ]
   },
   resolve: {
-    extensions: ['.js', '.jsx', '.scss']
+    extensions: ['.js', '.jsx', '.scss'],
+    modules: [path.join(__dirname, 'server', 'views', 'js'), "node_modules"]
   }
 };

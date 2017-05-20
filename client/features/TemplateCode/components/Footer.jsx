@@ -36,7 +36,8 @@ class Footer extends Component{
 		            </div>
 		        </div>
 		        <a id="to-top" href="#top" className="btn btn-dark btn-lg"><i className="fa fa-chevron-up fa-fw fa-1x"></i></a>
-		    </footer>)
+		    </footer>
+		    )
 	}
 }
 
